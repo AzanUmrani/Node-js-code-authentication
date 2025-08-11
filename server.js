@@ -14,14 +14,15 @@ const server = http.createServer(app);
 app.use(bodyParser.json({limit: '10mb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-const availabilitySlotRoutes = require('./Routes/availabilitySlotRoutes');
 const auth =require("./Routes/authUser")
+const package =require("./Routes/packageRoutes")
+const bookCourse =require("./Routes/bookCourseRoutes")
 
 
 // app.use('/api/auth', authRouter);
-app.use('/api/slots', availabilitySlotRoutes);
 app.use('/api/auth' , auth)
+app.use('/api/package' , package)
+app.use('/api/bookcourse' , bookCourse)
 
 app.get('/', (req, res) => {
     res.status(200).json({ status: 200, message: "API's are working" });

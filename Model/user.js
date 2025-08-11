@@ -21,12 +21,43 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
     },
     role: {
-      type: DataTypes.ENUM('admin', 'instructor', 'learner'),
-      defaultValue: 'learner',
+      type: DataTypes.ENUM('admin','user'),
+      defaultValue: 'user',
     },
     is_active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
+    },
+    i_want_to_be: {
+      type: DataTypes.STRING,
+    },
+    // experience: {
+    //   type: DataTypes.ENUM('complete_beginner', 'some_experience', 'test_ready'),
+    // },
+    experience: {
+      type: DataTypes.STRING,
+    },
+    postcode: {
+      type: DataTypes.STRING,
+    },
+    prefered_transmission: {
+      type: DataTypes.ENUM('manual', 'automatic'),
+    },
+    prefered_days: {
+      type: DataTypes.TEXT('long'),
+    },
+    prefered_time: {
+      type: DataTypes.TEXT('long'),
+    },
+    note: {
+      type: DataTypes.TEXT('long'),
+      allowNull: true,
+    },
+    phone: {
+      type: DataTypes.STRING,
+    },
+    package_id: {
+      type: DataTypes.STRING,
     },
     created_at: {
       type: DataTypes.DATE,
@@ -40,13 +71,6 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'users',
     timestamps: false,
   });
-
-  User.associate = (models) => {
-    User.hasMany(models.AvailabilitySlot, {
-      foreignKey: 'instructor_id',
-      as: 'slots'   // yeh alag alias hai, but yeh problem ka sabab nahi hai
-    });
-  };
 
   return User;
 };

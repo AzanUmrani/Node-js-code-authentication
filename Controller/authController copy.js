@@ -48,8 +48,7 @@ const registerScheme = Joi.object({
     last_name: Joi.string().required().messages({
         'string.empty': 'Last name is required.',
     }),
-    role: Joi.string().optional(),
-    i_want_to_be: Joi.string().optional(),
+    role: Joi.string().optional()
 });
 
 const loginScheme = Joi.object({
@@ -115,7 +114,7 @@ const register = async (req, res) => {
             });
         }
 
-        const { email, password, first_name, last_name, role,i_want_to_be } = value;
+        const { email, password, first_name, last_name, role } = value;
 
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
@@ -131,7 +130,6 @@ const register = async (req, res) => {
             last_name,
             password: hashedPassword,
             role: role || "user",
-            i_want_to_be: i_want_to_be,
             active: true,
         });
 
@@ -145,7 +143,6 @@ const register = async (req, res) => {
                 email: newUser.email,
                 first_name: newUser.first_name,
                 last_name: newUser.last_name,
-                i_want_to_be: newUser.i_want_to_be,
             },
             token,
         });
@@ -154,180 +151,6 @@ const register = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
-
-const insertPostalAndTransmission = async (req, res) => {
-    try {
-        const { user_id, postcode, prefered_transmission } = req.body;
-
-        if (!user_id || !postcode || !prefered_transmission) {
-            return res.status(400).json({ error: "user_id, postcode, and prefered_transmission are required" });
-        }
-
-        const user = await User.findByPk(user_id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        user.postcode = postcode;
-        user.prefered_transmission = prefered_transmission;
-        await user.save();
-
-        res.status(200).json({
-            message: "Step first inserted successfully",
-            user: {
-                id: user.id,
-                email: user.email,
-                postcode: user.postcode,
-                prefered_transmission: user.prefered_transmission,
-            }
-        });
-
-    } catch (error) {
-        console.error("Error inserting post code and prefered_transmission:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
-
-const insertexperience = async (req, res) => {
-    try {
-        const { user_id, experience } = req.body;
-
-        if (!user_id) {
-            return res.status(400).json({ error: "User ID is required" });
-        }
-        // if (!['complete_beginner', 'some_experience', 'test_ready'].includes(experience)) {
-        //     return res.status(400).json({ error: "Invalid experience value" });
-        // }
-
-        const user = await User.findByPk(user_id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        user.experience = experience;
-        await user.save();
-
-        res.status(200).json({
-            message: "Step second inserted successfully",
-            user: {
-                id: user.id,
-                experience: user.experience
-            }
-        });
-
-    } catch (error) {
-        console.error("Error insert experience:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
-
-const insertPackageId = async (req, res) => {
-    try {
-        const { user_id, package_id } = req.body;
-
-        if (!user_id || !package_id) {
-            return res.status(400).json({ error: "user_id and package_id are required" });
-        }
-
-        const user = await User.findByPk(user_id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        user.package_id = package_id;
-        await user.save();
-
-        res.status(200).json({
-            message: "Step third inserted successfully",
-            user: {
-                id: user.id,
-                email: user.email,
-                package_id: user.package_id
-            }
-        });
-
-    } catch (error) {
-        console.error("Error insert package_id:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
-
-const insertPreferences = async (req, res) => {
-    try {
-        const { user_id, prefered_days, prefered_time, note } = req.body;
-
-        if (!user_id || !Array.isArray(prefered_days) || prefered_days.length === 0 || 
-            !Array.isArray(prefered_time) || prefered_time.length === 0) {
-            return res.status(400).json({ 
-                error: "user_id, prefered_days, and prefered_time are required" 
-            });
-        }
-
-        const user = await User.findByPk(user_id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        user.prefered_days = JSON.stringify(prefered_days);
-        user.prefered_time = JSON.stringify(prefered_time);
-        user.note = note || null; 
-
-        await user.save();
-
-        res.status(200).json({
-            message: "Step fourth inserted successfully",
-            user: {
-                id: user.id,
-                email: user.email,
-                prefered_days: JSON.parse(user.prefered_days),
-                prefered_time: JSON.parse(user.prefered_time),
-                note: user.note
-            }
-        });
-
-    } catch (error) {
-        console.error("Error insert preferences:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
-
-const insertPhone = async (req, res) => {
-    try {
-        const { user_id, phone } = req.body;
-
-        if (!user_id || !phone) {
-            return res.status(400).json({ error: "user_id and phone are required" });
-        }
-
-        if (isNaN(phone)) {
-            return res.status(400).json({ error: "Phone must be a number" });
-        }
-
-        const user = await User.findByPk(user_id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        user.phone = phone;
-        await user.save();
-
-        res.status(200).json({
-            message: "Step fifth inserted successfully",
-            user: {
-                id: user.id,
-                email: user.email,
-                phone: user.phone
-            }
-        });
-
-    } catch (error) {
-        console.error("Error insert phone:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-};
-
-
-
 
 const login = async (req, res) => {
     try {
@@ -363,10 +186,5 @@ const login = async (req, res) => {
 
 module.exports = {
     register,
-    login,
-    insertexperience,
-    insertPostalAndTransmission,
-    insertPackageId,
-    insertPreferences,
-    insertPhone
+    login
 };
