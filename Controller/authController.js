@@ -147,6 +147,7 @@ const register = async (req, res) => {
                 first_name: newUser.first_name,
                 last_name: newUser.last_name,
                 i_want_to_be: newUser.i_want_to_be,
+                role: newUser.role,
             },
             token,
         });
@@ -437,7 +438,7 @@ const login = async (req, res) => {
         }
 
         const token = createJWTToken(existingUser.id, existingUser.email);
-        res.status(200).json({ status: 200, message: "Login successful", token });
+        res.status(200).json({ status: 200, message: "Login successful", token, role: existingUser.role });
 
     } catch (error) {
         console.error("Error in login:", error);
