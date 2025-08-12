@@ -17,7 +17,8 @@ const createBookCourse = async (req, res) => {
             addtional_information,
             have_you_been_ordered,
             preferred_start_date,
-            instructor_id
+            instructor_id,
+            status
         } = req.body;
 
         if (!package_id || !first_name || !contact_no || !email || !instructor_id) {
@@ -41,7 +42,8 @@ const createBookCourse = async (req, res) => {
             addtional_information,
             have_you_been_ordered,
             preferred_start_date,
-            instructor_id
+            instructor_id,
+            status
         });
 
         res.status(201).json({
@@ -96,7 +98,46 @@ const getInstructorBookings = async (req, res) => {
     }
 };
 
+const updateStatus = async (req, res) => {
+    try {
+        const { id, status } = req.body;
+
+        if (!id || !status) {
+            return res.status(400).json({
+                success: false,
+                message: "Booking course ID and status are required."
+            });
+        }
+
+        const booking = await BookCourse.findByPk(id);
+
+        if (!booking) {
+            return res.status(404).json({
+                success: false,
+                message: "Booking not found."
+            });
+        }
+
+        booking.status = status;
+        await booking.save();
+
+        return res.json({
+            success: true,
+            message: "Booking course status updated successfully.",
+            data: booking
+        });
+
+    } catch (error) {
+        console.error("Error updating booking status:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error."
+        });
+    }
+};
+
 module.exports = {
     createBookCourse,
-    getInstructorBookings
+    getInstructorBookings,
+    updateStatus
 };

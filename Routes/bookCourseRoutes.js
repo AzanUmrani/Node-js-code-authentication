@@ -5,5 +5,6 @@ const verifyJWT = require("../middleware/authMiddleware");
 
 router.post("/create", verifyJWT, bookCourseController.createBookCourse);
 router.get('/instructor/:instructor_id/bookings', verifyJWT, bookCourseController.getInstructorBookings);
+router.put("/status", verifyJWT, bookCourseController.updateStatus);
 
 module.exports = router;
