@@ -45,10 +45,24 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATEONLY,
             allowNull: true
         },
+        status: {
+            type: DataTypes.ENUM('pending', 'confirmed', 'cancelled', 'completed'),
+            defaultValue: 'pending',
+        },
         instructor_id: {
             type: DataTypes.INTEGER,
             allowNull: false
-        }
+        },
+        created_at: {
+            type: DataTypes.DATE, 
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
+        updated_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
     }, {
         tableName: 'book_course',
         timestamps: false

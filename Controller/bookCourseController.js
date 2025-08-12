@@ -1,7 +1,9 @@
 const db = require("../Model/index");
 const BookCourse = db.BookCourse;
+const User = db.user;
+const Package = db.Package;
 
-exports.createBookCourse = async (req, res) => {
+const createBookCourse = async (req, res) => {
     try {
         const {
             package_id,
@@ -55,4 +57,46 @@ exports.createBookCourse = async (req, res) => {
             message: "Internal server error"
         });
     }
+};
+
+const getInstructorBookings = async (req, res) => {
+    try {
+        const { instructor_id } = req.params;
+
+        const bookings = await BookCourse.findAll({
+            where: { instructor_id },
+            include: [
+                {
+                    model: User,
+                    as: 'instructor',
+                },
+                { 
+                    model: Package,
+                    as: 'package' 
+                }
+            ]
+        });
+
+        if (!bookings.length) {
+            return res.status(404).json({
+                status: false,
+                message: "No bookings found for this instructor"
+            });
+        }
+
+        res.status(200).json({
+            status: true,
+            total_bookings: bookings.length,
+            data: bookings
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: false, message: "Server error" });
+    }
+};
+
+module.exports = {
+    createBookCourse,
+    getInstructorBookings
 };

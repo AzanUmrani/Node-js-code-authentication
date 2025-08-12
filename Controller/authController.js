@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db = require('../Model/index');
 const process = require('process');
+const Package = db.Package;
 require('dotenv').config();
 
 const User = db.user;
@@ -130,7 +131,7 @@ const register = async (req, res) => {
             first_name,
             last_name,
             password: hashedPassword,
-            role: role || "user",
+            role: role || "learner",
             i_want_to_be: i_want_to_be,
             active: true,
         });
@@ -326,6 +327,89 @@ const insertPhone = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const fieldsToUpdate = {};
+        const allowedFields = [
+            "email",
+            "first_name",
+            "last_name",
+            "i_want_to_be",
+            "experience",
+            "postcode",
+            "prefered_transmission",
+            "prefered_days",
+            "prefered_time",
+            "note",
+            "phone"
+        ];
+
+        allowedFields.forEach(field => {
+            if (req.body[field] !== undefined) {
+                if (field === "prefered_days" || field === "prefered_time") {
+                    fieldsToUpdate[field] = JSON.stringify(req.body[field]);
+                } else {
+                    fieldsToUpdate[field] = req.body[field];
+                }
+            }
+        });
+
+        await user.update(fieldsToUpdate);
+
+        res.json({
+            success: true,
+            message: "Profile updated successfully",
+            data: user
+        });
+
+    } catch (err) {
+        console.error("Update Profile Error:", err);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+};
+
+const viewProfile = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findOne({
+            where: { id },
+            include: [
+                {
+                    model: Package,
+                    as: 'package',
+                }
+            ]
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+            status: true,
+            message: "Profile fetched successfully",
+            data: user
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
 
 
 
@@ -368,5 +452,7 @@ module.exports = {
     insertPostalAndTransmission,
     insertPackageId,
     insertPreferences,
-    insertPhone
+    insertPhone,
+    updateUser,
+    viewProfile
 };

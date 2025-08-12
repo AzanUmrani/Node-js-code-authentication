@@ -21,9 +21,26 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.user = require('./user.js')(sequelize, DataTypes);
-db.profile = require('./Profile.js')(sequelize, DataTypes);
 db.Package = require('./Package.js')(sequelize, DataTypes);
 db.BookCourse = require('./BookCourse.js')(sequelize, DataTypes);
+
+
+// relationship code
+
+// User ↔ Package
+db.user.belongsTo(db.Package, { foreignKey: 'package_id', as: 'package' });
+db.Package.hasMany(db.user, { foreignKey: 'package_id', as: 'users' });
+
+// BookCourse ↔ Instructor (User)
+db.BookCourse.belongsTo(db.user, { foreignKey: 'instructor_id', as: 'instructor' });
+db.user.hasMany(db.BookCourse, { foreignKey: 'instructor_id', as: 'bookings' });
+
+// BookCourse ↔ Package
+db.BookCourse.belongsTo(db.Package, { foreignKey: 'package_id', as: 'package' });
+db.Package.hasMany(db.BookCourse, { foreignKey: 'package_id', as: 'bookings' });
+
+// end relationship code
+
 
 // db.chatSystem = chatSystem;
 db.sequelize.sync({ force: false })
