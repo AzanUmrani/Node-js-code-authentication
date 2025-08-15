@@ -23,6 +23,7 @@ db.sequelize = sequelize;
 db.user = require('./user.js')(sequelize, DataTypes);
 db.Package = require('./Package.js')(sequelize, DataTypes);
 db.BookCourse = require('./BookCourse.js')(sequelize, DataTypes);
+db.BecomeADrivingInstructor = require('./become_a_driving_instructor.js')(sequelize, DataTypes);
 
 
 // relationship code
@@ -38,6 +39,9 @@ db.user.hasMany(db.BookCourse, { foreignKey: 'instructor_id', as: 'bookings' });
 // BookCourse ↔ Package
 db.BookCourse.belongsTo(db.Package, { foreignKey: 'package_id', as: 'package' });
 db.Package.hasMany(db.BookCourse, { foreignKey: 'package_id', as: 'bookings' });
+
+db.BecomeADrivingInstructor.belongsTo(db.user, { foreignKey: 'instructor_id', as: 'instructor' });
+db.user.hasMany(db.BecomeADrivingInstructor, { foreignKey: 'instructor_id', as: 'become_a_driving_instructor' });
 
 // end relationship code
 

@@ -18,12 +18,14 @@ const auth = require("./Routes/authUser");
 const package = require("./Routes/packageRoutes");
 const bookCourse = require("./Routes/bookCourseRoutes");
 const userCourse = require("./Routes/userRoutes");
+const bookinstructor = require("./Routes/becomeInstructorRoutes");
 
 // Routes
 app.use('/api/auth', auth);
 app.use('/api/package', package);
 app.use('/api/bookcourse', bookCourse);
 app.use('/api/users', userCourse);
+app.use('/api/bookinstructor', bookinstructor);
 
 app.get('/', (req, res) => {
     res.status(200).json({ status: 200, message: "API's are working" });
